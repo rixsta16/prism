@@ -1,62 +1,62 @@
 # Pages
 
 Every screen Prism advertises, its current state, and what it must contain.
-The sidebar in the v0.1 scaffold links to seven destinations. **One of them
-exists.** The rest are `href="#"`.
+As of v0.3 every sidebar destination resolves to a real view driven by the
+store. Two catalogue modules remain unimplemented and render as upsell slots.
 
 ```mermaid
 flowchart TD
-    root["#/"] --> ov["#/overview<br/>BUILT · placeholder data"]
-    root -.-> an["#/analytics"]
-    root -.-> rp["#/reports<br/>badge says 2 · nothing generates them"]
-    root -.-> ds["#/data-sources"]
-    root -.-> ad["#/admin"]
-    root -.-> st["#/settings"]
-    root -.-> pm["#/modules/production-story"]
-    root -.-> cm["#/modules/crm-pipeline"]
+    root["#/"] --> ov["#/overview"]
+    root --> an["#/analytics<br/>4 tabs"]
+    root --> rp["#/reports<br/>generate + schedule"]
+    root --> ds["#/data-sources"]
+    root --> ad["#/admin"]
+    root --> st["#/settings"]
+    root --> pm["#/modules/production-story"]
+    root --> cm["#/modules/crm-pipeline"]
+    root -.-> inv["inventory<br/>upsell slot only"]
+    root -.-> ec["eCommerce Connect<br/>upsell slot · blocked on backend"]
     root -.-> so["sign out<br/>no auth exists"]
 
     classDef built stroke-width:3px
-    class ov built
+    class ov,an,rp,ds,ad,st,pm,cm built
 ```
 
-Solid line = exists. Dotted = `href="#"`.
+Solid line = built and routed. Dotted = not implemented.
 
 | Screen | Route | State |
 | --- | --- | --- |
-| Overview | `#/overview` | Built, placeholder data |
-| Analytics | `#/analytics` | Not built |
-| Reports | `#/reports` | Not built — sidebar shows a badge of `2` |
-| Data Sources | `#/data-sources` | Not built |
-| Admin Panel | `#/admin` | Not built |
-| Production Story | `#/modules/production-story` | Not built |
-| CRM + Pipeline | `#/modules/crm-pipeline` | Not built |
-| Settings | `#/settings` | Not built |
+| Overview | `#/overview` | Built |
+| Analytics | `#/analytics` | Built — Revenue / Orders / Clients / Pipeline tabs |
+| Reports | `#/reports` | Built — generate, schedule list, print-to-PDF |
+| Data Sources | `#/data-sources` | Built — connected source, catalogue, mapping (read-only) |
+| Admin Panel | `#/admin` | Built — tenant, users, modules, audit log |
+| Settings | `#/settings` | Built — preferences persist to `localStorage` |
+| Production Story | `#/modules/production-story` | Built — module, plus an Overview widget |
+| CRM + Pipeline | `#/modules/crm-pipeline` | Built — deal board and forecast |
+| Inventory | — | Catalogue entry only |
+| eCommerce Connect | — | Catalogue entry only, blocked on backend |
 | Sign out | — | No auth exists |
 
 ---
 
 ## Overview — built
 
-The only complete screen. Top to bottom: AI digest bar, five-stat KPI bar,
-period pills, revenue trend + orders-by-status charts, recent records table,
-module upsell slots, footer.
+AI digest, five-stat KPI bar, period pills, two charts, recent records, module
+upsell slots. Every figure comes from the store.
 
-Working: layout, both charts, pill and stat active-state toggling.
+- Pills set the period window on the store; every date-bounded metric follows.
+- Selecting a stat re-renders the left chart for that metric.
+- The digest is derived from the store — real numbers, no model call yet, and
+  it says nothing when there is not enough data.
+- Point-in-time KPIs (Clients, Outstanding, Pipeline) carry a screen-reader
+  note that the period filter does not apply to them.
+- Module slots dispatch `prism:enable-module`; enabling is still a provisioning
+  change, and the app says so rather than pretending.
 
-Not working:
-- Every number is hardcoded in markup or in the chart config.
-- Pills toggle a class and filter nothing.
-- Stats toggle a class and change nothing below them.
-- `View all` and `Refresh` are inert.
-- Module slots are not clickable despite reading "Click to enable".
-- AI digest text is a static placeholder.
-- Tenant placeholders (`<!-- CLIENT_NAME -->` etc.) render as empty strings, so
-  the topbar subtitle currently reads as a bare dash.
+## Analytics — built
 
-## Analytics — not built
-
-Deeper cuts of the same data. Proposed contents:
+Deeper cuts of the same data, in four tabs:
 
 - Tabbed sections: Revenue, Orders, Clients, Pipeline.
 - Revenue: trend with a comparison overlay for the previous period, breakdown
@@ -66,10 +66,10 @@ Deeper cuts of the same data. Proposed contents:
   — a genuine risk signal for an SMB), dormancy list.
 - Every chart exports its underlying rows to CSV.
 
-## Reports — not built
+## Reports — built
 
-The sidebar badge of `2` implies two reports are waiting. Nothing generates
-them.
+Generate on demand, preview inline, print to PDF. Scheduled reports are listed
+but not yet dispatched — that needs the backend decision.
 
 - Report list: name, period, generated date, format.
 - Scheduled reports: weekly digest, month-end summary.
@@ -77,10 +77,10 @@ them.
 - Output as PDF (print stylesheet first — a print stylesheet is cheap and
   removes any PDF dependency) and CSV.
 
-## Data Sources — not built
+## Data Sources — built (read-only)
 
-Where a tenant connects their data. This screen is what makes Prism a product
-rather than a bespoke page.
+Where a tenant connects their data. The screen exists; only the sample adapter
+is wired, and field mapping renders but does not yet save.
 
 - Connected sources with status, last sync time, record counts.
 - Add a source: CSV upload, REST endpoint, or an integration (Xero, QuickBooks,
@@ -89,7 +89,7 @@ rather than a bespoke page.
   no two SMBs name their columns the same way.
 - Sync history with failures and their reasons.
 
-## Admin Panel — not built
+## Admin Panel — built (read-only)
 
 - Tenant profile and branding.
 - Users and roles (owner, operator, viewer).
@@ -97,9 +97,10 @@ rather than a bespoke page.
 - Data source configuration.
 - Audit log.
 
-Gated behind a role check that does not yet exist.
+The role gate is advisory, not a boundary: Prism has no authentication, and the
+screen says so at the top rather than implying protection it does not have.
 
-## Settings — not built
+## Settings — built
 
 User-scoped, distinct from Admin's tenant scope.
 
@@ -144,6 +145,6 @@ stateDiagram-v2
 | **Error** | States what failed and offers a retry; never a raw stack trace |
 | **Partial** | One source failed while others succeeded: render what loaded and mark the gap |
 
-A brand-new tenant with no data connected currently sees five zeros, two
-charts of invented numbers, and five rows about companies that do not exist.
-That is the single worst first impression in the product.
+A brand-new tenant with no data connected now sees one empty state with a
+single action — Connect a data source — instead of five zeros and five rows
+about companies that do not exist.

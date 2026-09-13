@@ -35,7 +35,7 @@ truth: no component may hardcode a colour, radius or duration.
 | `--gold-dim` | `rgba(201,168,76,0.12)` | Active backgrounds, chart fills |
 | `--gold-glow` | `rgba(201,168,76,0.25)` | Focus rings, hover emphasis |
 | `--text` | `#e8e4da` | Primary text |
-| `--text-muted` | `#7a7a8a` | Labels, secondary text, axis ticks |
+| `--text-muted` | `#9a9aac` | Labels, secondary text, axis ticks (raised for AA) |
 | `--text-dim` | `#4a4a5a` | Disabled, tertiary, footer |
 | `--green` | `#2ec4a0` | Positive delta, complete, paid |
 | `--red` | `#e05c6a` | Negative delta, overdue, failed |
@@ -50,11 +50,11 @@ truth: no component may hardcode a colour, radius or duration.
 | `--sidebar-w` | `220px` | Sidebar width |
 | `--transition` | `0.18s ease` | All hover/active transitions |
 
-### Tokens still to add
+### Spacing, type and stacking
 
-The scaffold hardcodes spacing and type sizes inline. Phase 1 promotes them:
+Added in Phase 1, in `tokens.css`:
 
-| Proposed token | Value | Replaces |
+| Token | Value | Replaces |
 | --- | --- | --- |
 | `--space-1` … `--space-6` | `4 / 8 / 12 / 16 / 24 / 32px` | Ad-hoc padding and gap values |
 | `--text-xs` … `--text-xl` | `11 / 12 / 14 / 18 / 24px` | Inline `font-size` declarations |
@@ -119,9 +119,8 @@ flowchart TD
 `.shell` is a full-height flex row; the sidebar is fixed-width and the main
 column scrolls independently. Card grids use `grid-2` and `grid-3`.
 
-**Known gap: Prism has no responsive behaviour.** There is not a single media
-query in the scaffold. Below roughly 1100px the stat bar crushes and the
-two-column grid overflows. Phase 2 adds three breakpoints:
+Three breakpoints live in `assets/css/responsive.css`, loaded last so its
+overrides win:
 
 | Breakpoint | Behaviour |
 | --- | --- |
@@ -146,6 +145,13 @@ two-column grid overflows. Phase 2 adds three breakpoints:
 | Badge | `.badge` + `-green` `-amber` `-red` `-blue` `-muted` | Status pill. Colour mapping is defined in DATA-MODEL.md, not per-view |
 | Module slot | `.module-slot`, `-icon`, `-name`, `-desc`, `-price` | Upsell tile for a disabled module |
 | Sparkline | `.spark` | Inline micro-trend; not yet used in markup |
+| Tabs | `.tabs`, `.tab` | `role="tablist"`; the active tab carries `aria-selected` |
+| State block | `.state` + `-loading` `-empty` `-error` `-partial` | The four states every data component needs |
+| Skeleton | `.skeleton`, `.skeleton-line`, `.skeleton-block` | Matches the final layout so nothing jumps on load |
+| Form field | `.field`, `.input`, `.select`, `.switch` | Settings, Admin, Data Sources |
+| Kanban | `.board`, `.board-col`, `.deal-card` | CRM pipeline board |
+| Stage pipeline | `.pipeline`, `.pipeline-stage` | Production Story; `.bottleneck` marks the slowest stage |
+| Source row | `.source-row` | Data Sources connection list |
 
 ### Utilities
 
@@ -162,27 +168,31 @@ Inline SVG, 16×16 viewBox, `stroke="currentColor"`, `stroke-width="1.6"`, no
 fill. Icons inherit their colour from the parent so active and hover states
 need no icon-specific rules. Decorative icons take `aria-hidden="true"`.
 
-Module slots currently use emoji (🏭 📦 🔗). Emoji render inconsistently across
-platforms and do not inherit colour — Phase 2 replaces them with the same
-stroked SVG set.
+Module slots use geometric glyphs (◫ ◍ ▤ ⇄) rather than emoji, which render
+inconsistently across platforms and do not inherit colour. Nav icons are the
+stroked SVG set, defined once in `src/app.js`.
 
-## Accessibility — current state and required work
+## Accessibility
 
-This is the weakest area of the scaffold. All of the following are open:
+Done:
 
-- Nav items are `<a href="#">`. They must be real routes with
-  `aria-current="page"` on the active item.
-- `.pill` and `.stat` are click-handled `<div>`s: not focusable, not
-  keyboard-operable, no role. Pills become `<button role="tab">` in a
-  `role="tablist"`; stats become `<button aria-pressed>`.
-- There is no visible focus style anywhere. A `2px` `--gold-glow` outline with
-  `outline-offset: 2px` is required on every interactive element.
-- Contrast: `--text-muted` on `--surface` measures about 4.0:1 — below WCAG AA
-  for body text. It is acceptable for large or bold text only; anywhere it is
-  used for 11–13px body copy it must move to `--text`.
-- Charts convey data by colour alone and have no text alternative. Each chart
-  needs an adjacent visually-hidden table or a summary sentence.
-- No skip link to main content.
-- No `prefers-reduced-motion` handling on transitions.
+- Nav items are real routes and the active one carries `aria-current="page"`.
+- Pills and stats are `<button>`: focusable, keyboard-operable, with
+  `aria-selected` / `aria-pressed`. Analytics tabs use `role="tablist"`.
+- A `2px` `--gold-glow` focus ring with `outline-offset: 2px` on every
+  interactive element, via `:focus-visible`.
+- `--text-muted` raised from `#7a7a8a` to `#9a9aac` so 11–13px body copy clears
+  WCAG AA on `--surface`.
+- Skip link to main content; `#view` is focusable as the landmark target.
+- `prefers-reduced-motion` disables transitions and the skeleton shimmer.
+- Point-in-time KPIs carry a visually-hidden note that the period filter does
+  not apply to them.
+
+Still open:
+
+- Charts convey their data by colour alone. Each needs an adjacent
+  visually-hidden table or a summary sentence.
+- The off-canvas sidebar closes on Escape but does not trap focus while open.
+- No audit has been run against a real screen reader.
 
 Target: WCAG 2.1 AA before the first paying tenant.

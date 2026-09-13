@@ -18,8 +18,8 @@ python3 -m http.server 8000
 npx serve .
 ```
 
-Open http://localhost:8000. Opening `index.html` via `file://` works today but
-stops working in Phase 1: ES modules and `fetch` both require an origin.
+Open http://localhost:8000. `file://` does not work: the app is built from ES
+modules, which require an origin.
 
 ## Tenant provisioning (target)
 
@@ -48,9 +48,11 @@ artefact is `prism.config.js`.
 5. Point the client subdomain at it
 ```
 
-`prism.config.js` is git-ignored in the template repo so a tenant's details are
-never committed upstream. In a client repo it is committed — it contains no
-secrets by design. Any credential lives with the host, never in the bundle.
+This repo commits a `prism.config.js` holding the demo tenant, because the
+public GitHub Pages demo has to boot. A client deployment replaces that file
+wholesale; `prism.config.example.js` is the template to copy. Neither contains
+a secret by design — any credential lives with the host, never in the bundle,
+so a committed config leaks nothing.
 
 Phase 6 turns this into one script. Until then it is a documented manual
 sequence, and the risk to watch is drift: a tenant deployment that has been
@@ -63,15 +65,15 @@ hand-edited can no longer take an upstream update.
 | Static file serving | That is all Prism is |
 | HTTPS | Non-negotiable once real data is loaded |
 | No rewrite rules needed | Hash routing is chosen precisely to avoid this |
-| CDN reachable | Chart.js loads from jsdelivr |
+| No external requests | Chart.js is vendored; the page loads nothing third-party |
 
-### Vendor Chart.js before the first paying tenant
+### Chart.js is vendored
 
-Chart.js currently loads from `cdn.jsdelivr.net`. A CDN outage blanks both
-charts, and a third-party script tag on a page showing client financials is a
-supply-chain exposure. Either vendor the file into `assets/vendor/` or, at
-minimum, add Subresource Integrity to the script tag. The pin to `4.5.0` is
-correct and should stay exact.
+Chart.js 4.5.0 lives in `assets/vendor/chart.umd.js` and is served from the
+same origin. It used to load from `cdn.jsdelivr.net`, which meant a CDN outage
+blanked both charts and put a third-party script tag on a page showing client
+financials. Keep the pin exact when upgrading, and re-vendor rather than
+reaching back out to a CDN.
 
 ## Release process (target)
 

@@ -16,26 +16,50 @@
    in-memory store. Swapping the placeholder adapter for a live API adapter must
    not require changing a single view.
 
-## Current shape (v0.1)
+## Current shape (v0.3)
 
 ```
 prism/
-├── index.html      # everything: tokens, layout, markup, charts, handlers
-├── README.md
+├── index.html                 # app shell only — nav is built at runtime
+├── prism.config.js            # per-tenant config (git-ignored)
+├── prism.config.example.js    # committed template
+├── assets/
+│   ├── css/
+│   │   ├── tokens.css         # design tokens, single source of truth
+│   │   ├── base.css           # reset, layout, focus, utilities
+│   │   ├── components.css     # cards, stats, tables, pills, forms, board
+│   │   └── responsive.css     # loaded last so its overrides win
+│   └── vendor/chart.umd.js    # Chart.js 4.5.0, vendored not CDN-loaded
+├── src/
+│   ├── app.js                 # bootstrap, nav, adapter selection
+│   ├── config.js              # load + validate prism.config.js
+│   ├── router.js              # hash routing + view mount/unmount
+│   ├── store.js               # normalised store + subscribers
+│   ├── metrics.js             # KPI and series derivation
+│   ├── format.js              # currency, dates, deltas, compact numbers
+│   ├── periods.js             # the period windows behind the pills
+│   ├── charts.js              # Chart.js defaults + tracked instances
+│   ├── csv.js                 # export, with formula-injection guarding
+│   ├── prefs.js               # per-viewer localStorage, guarded
+│   ├── ui.js                  # DOM helpers; textContent only
+│   ├── adapters/mock.js
+│   ├── views/                 # overview, analytics, reports,
+│   │                          # data-sources, admin, settings
+│   └── modules/
+│       ├── registry.js        # catalogue, dynamic import, widget slots
+│       ├── crm-pipeline/
+│       ├── production-story/
+│       ├── inventory/         # contract stub — not implemented
+│       └── ecommerce/         # contract stub — blocked on backend
 └── docs/
 ```
 
-`index.html` is ~1,100 lines and contains four concerns in one file: design
-tokens and CSS, page markup, Chart.js configuration, and DOM event handlers.
-This is acceptable for a scaffold and is the first thing Phase 1 unpicks.
-
-Tenant values are currently HTML comment placeholders — `<!-- CLIENT_NAME -->`,
-`<!-- CLIENT_EMAIL -->`, `<!-- FIRM_NAME -->`, `<!-- WEEK_DATE -->` — intended
-for string substitution at provisioning time. This works but is fragile: it
-cannot be validated, cannot be typed, and breaks silently when a placeholder is
-renamed. It is replaced by `prism.config.js` in Phase 1.
+Still no bundler. Native ES modules give the file split without a build step.
 
 ## Target shape (v1.0)
+
+The remaining gap is `src/adapters/rest.js` and `src/adapters/csv.js`.
+
 
 ```
 prism/
