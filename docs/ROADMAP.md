@@ -36,6 +36,33 @@ designed and about 10% built.
 
 ---
 
+## Phases at a glance
+
+```mermaid
+flowchart LR
+    v01["v0.1<br/>scaffold<br/>YOU ARE HERE"] --> p1["Phase 1 · v0.2<br/>Foundations<br/>split files · store · adapters"]
+    p1 --> p2["Phase 2 · v0.3<br/>Shell complete<br/>router · states · responsive · a11y"]
+    p2 --> p3["Phase 3 · v0.4<br/>Real data<br/>REST · CSV · Data Sources"]
+    p3 --> p4["Phase 4 · v0.5<br/>Core screens<br/>Analytics · Reports · Admin"]
+    p4 --> p5["Phase 5 · v0.6<br/>Modules<br/>registry · CRM · Production · Inventory"]
+    p5 --> p6["Phase 6 · v1.0<br/>Production<br/>auth · eCommerce · tests · provisioning"]
+
+    q{{"OPEN QUESTIONS<br/>backend? · auth? · multi-tenant?"}} -.blocks.-> p3
+    q -.blocks.-> p6
+
+    classDef now stroke-width:3px
+    class v01 now
+```
+
+Completeness, honestly:
+
+```mermaid
+pie showData
+    title Screens built vs. linked
+    "Built (Overview)" : 1
+    "Linked but empty" : 8
+```
+
 ## Phase 1 — Foundations (v0.2)
 
 Goal: the same screen, driven by real structure.

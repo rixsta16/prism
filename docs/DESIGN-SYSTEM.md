@@ -81,18 +81,39 @@ align vertically in tables.
 
 ## Layout
 
+```mermaid
+flowchart LR
+    subgraph shell[".shell — flex row, 100vh"]
+        direction LR
+        subgraph side["sidebar · 220px fixed"]
+            direction TB
+            logo["logo"] --> nav["nav<br/>Workspace · Modules"] --> foot["footer<br/>user · settings · sign out"]
+        end
+        subgraph main["main · scrolls"]
+            direction TB
+            top["topbar · 56px sticky"]
+            ai["ai-bar"]
+            stats["stat-bar · 5 across"]
+            pills["pills · period filter"]
+            g2["grid-2 · revenue | orders"]
+            table["card · records table"]
+            g3["grid-3 · module slots"]
+            top --> ai --> stats --> pills --> g2 --> table --> g3
+        end
+    end
 ```
-┌──────────┬───────────────────────────────────────────────┐
-│ sidebar  │ topbar          (56px, sticky)                │
-│ 220px    ├───────────────────────────────────────────────┤
-│ fixed    │ content (scrolls)                             │
-│          │   ai-bar                                      │
-│ logo     │   stat-bar      (5 across)                    │
-│ nav      │   pills                                       │
-│ modules  │   grid-2        (revenue | orders)            │
-│ ─────    │   card          (data table)                  │
-│ footer   │   grid-3        (module slots)                │
-└──────────┴───────────────────────────────────────────────┘
+
+Responsive plan — none of this exists yet:
+
+```mermaid
+flowchart TD
+    w["viewport width"] --> a{"≥ 1280px"}
+    a -- yes --> full["stat-bar 5 across<br/>grid-2 + grid-3 as designed"]
+    a -- no --> b{"≥ 1024px"}
+    b -- yes --> mid["stat-bar wraps 3 + 2"]
+    b -- no --> c{"≥ 768px"}
+    c -- yes --> tab["grid-2 and grid-3<br/>collapse to one column"]
+    c -- no --> phone["sidebar → off-canvas drawer<br/>table scrolls horizontally"]
 ```
 
 `.shell` is a full-height flex row; the sidebar is fixed-width and the main

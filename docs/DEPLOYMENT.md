@@ -23,6 +23,20 @@ stops working in Phase 1: ES modules and `fetch` both require an origin.
 
 ## Tenant provisioning (target)
 
+```mermaid
+flowchart LR
+    tpl["Prism template repo<br/>rixsta16/prism"] --> clone["create client repo<br/>from template"]
+    clone --> cfg["copy prism.config.example.js<br/>→ prism.config.js"]
+    cfg --> fill["fill tenant · locale<br/>branding · dataSource · modules"]
+    fill --> deploy["deploy static folder"]
+    deploy --> dns["point client subdomain"]
+    dns --> live(["live tenant"])
+
+    tag["upstream tag<br/>v0.2 · v0.3 · …"] --> deploy
+    drift{{"hand-edited tenant<br/>cannot take updates"}} -.risk.-> deploy
+```
+
+
 Each client gets their own deployment of the same code. The only per-tenant
 artefact is `prism.config.js`.
 

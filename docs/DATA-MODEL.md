@@ -10,6 +10,44 @@ time. Never store currency as a float. Dates are stored as **ISO 8601 strings**
 
 ## Entities
 
+```mermaid
+erDiagram
+    CLIENT ||--o{ RECORD : "has"
+    CLIENT ||--o{ DEAL : "has"
+    RECORD }o--|| STATUS : "carries"
+
+    CLIENT {
+        string id PK
+        string name "untrusted"
+        string email
+        enum   status "active|dormant|archived"
+        date   createdAt
+        array  tags
+    }
+    RECORD {
+        string id PK
+        string clientId FK
+        enum   type "order|invoice|quote"
+        int    value "minor units"
+        date   date "issue date"
+        date   dueDate "nullable"
+        enum   status
+    }
+    DEAL {
+        string id PK
+        string clientId FK "nullable"
+        enum   stage "lead|qualified|proposal|negotiation|won|lost"
+        int    value "minor units"
+        int    probability "0-100"
+        date   expectedClose
+    }
+    STATUS {
+        enum name "complete|in_progress|awaiting|overdue|draft"
+        string badge "green|blue|amber|red|muted"
+    }
+```
+
+
 ### Client
 
 | Field | Type | Notes |
@@ -35,6 +73,28 @@ They share a shape so one table can render all three.
 | `date` | ISO date | Issue date, not due date |
 | `dueDate` | ISO date \| null | Invoices and orders only |
 | `status` | see below | |
+
+### Status lifecycle
+
+```mermaid
+stateDiagram-v2
+    [*] --> draft
+    draft --> in_progress : issued
+    in_progress --> awaiting : blocked on client
+    awaiting --> in_progress : client responds
+    in_progress --> complete : paid / accepted
+    awaiting --> complete : paid / accepted
+    in_progress --> overdue : past dueDate
+    awaiting --> overdue : past dueDate
+    overdue --> complete : paid late
+    complete --> [*]
+
+    note right of overdue
+        DERIVED, never stored.
+        dueDate in the past
+        AND status != complete
+    end note
+```
 
 ### Status vocabulary
 
@@ -65,6 +125,27 @@ send `overdue` as a stored value, or the two sources will disagree.
 | `expectedClose` | ISO date \| null | |
 
 ## Metric definitions
+
+```mermaid
+flowchart LR
+    R[("records")] --> inv{"type = invoice"}
+    R --> ord{"type = order"}
+    C[("clients")] --> act{"status = active"}
+    D[("deals")] --> open{"stage not in<br/>won, lost"}
+
+    inv --> paid{"status = complete<br/>AND date in month"}
+    inv --> unpaid{"status in<br/>awaiting, overdue"}
+
+    paid --> rev["Revenue (MTD)"]
+    unpaid --> out["Outstanding"]
+    ord --> cnt["Orders"]
+    act --> cli["Clients"]
+    open --> pipe["Pipeline"]
+
+    rev:::gold
+    classDef gold stroke-width:2px
+```
+
 
 Ambiguous metrics are the fastest way to lose a client's trust. Each KPI has
 exactly one definition.

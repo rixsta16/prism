@@ -78,26 +78,47 @@ network latency makes it necessary, and that decision is deferred past v1.0.
 
 ## Runtime model
 
+```mermaid
+flowchart TD
+    boot([boot]) --> cfg["load prism.config.js"]
+    cfg --> validate{"config valid?"}
+    validate -- no --> fail["hard fail<br/>readable message"]
+    validate -- yes --> pick["select adapter<br/>from config.dataSource"]
+
+    pick --> mock["mock"]
+    pick --> rest["rest"]
+    pick --> csv["csv"]
+
+    mock --> fetch["adapter.fetch({from, to})"]
+    rest --> fetch
+    csv  --> fetch
+
+    fetch --> norm["normalise"]
+    norm --> store[("store<br/>clients · records · deals")]
+
+    cfg --> reg["registry.register(module)<br/>for each enabled module"]
+    reg --> contrib["module contributes<br/>nav · routes · widgets"]
+    contrib --> router
+
+    store --> router["router.start()"]
+    router --> hash{"hashchange"}
+    hash --> mount["view.mount(root, store, config)"]
+    mount --> unmount["view.unmount()<br/>destroys charts"]
+    unmount --> hash
 ```
- boot
-   │
-   ├─ load prism.config.js ─────────► config (tenant, branding, modules[])
-   │
-   ├─ select adapter from config.dataSource
-   │        mock │ rest │ csv
-   │
-   ├─ adapter.fetch() ──────────────► raw payload
-   │        │
-   │        └─ normalise ──────────► store { kpis, revenue, orders, clients,
-   │                                          invoices, pipeline }
-   │
-   ├─ registry.register(module) for each enabled module
-   │        └─ module contributes nav items, routes, widgets
-   │
-   └─ router.start()
-            │
-            └─ on hashchange ──────► view.mount(root, store, config)
-                                     view.unmount()  (destroys charts)
+
+The store sits between the adapters and the views, and nothing crosses it in
+the wrong direction:
+
+```mermaid
+flowchart LR
+    src["data source<br/>API · CSV · mock"] --> adapter["adapter<br/>no DOM"]
+    adapter --> store[("store<br/>normalised entities")]
+    store --> derive["derive<br/>KPIs · series"]
+    derive --> view["view<br/>no fetching"]
+    view --> fmt["format.js<br/>currency · dates · deltas"]
+    fmt --> dom["DOM<br/>textContent only"]
+    view -. "subscribe / unsubscribe" .-> store
 ```
 
 **Store.** A plain object plus a subscribe/notify pair. Views subscribe on

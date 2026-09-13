@@ -14,6 +14,28 @@ intelligence dashboard by Wohlf Solutions.
 | [DEPLOYMENT.md](DEPLOYMENT.md) | Hosting, tenant provisioning, release process |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Conventions, branch/PR rules, review checklist |
 
+## Diagram index
+
+Every doc below carries Mermaid diagrams — GitHub renders them inline.
+
+| Diagram | Lives in |
+| --- | --- |
+| Runtime model (boot → config → adapter → store → router) | ARCHITECTURE |
+| Data flow direction rules | ARCHITECTURE |
+| Layout skeleton | DESIGN-SYSTEM |
+| Responsive breakpoint decision tree | DESIGN-SYSTEM |
+| Entity relationships (ER) | DATA-MODEL |
+| Record status lifecycle | DATA-MODEL |
+| Metric provenance | DATA-MODEL |
+| Module plug-in flow | MODULES |
+| Widget slot map | MODULES |
+| Module build-order dependencies | MODULES |
+| Route map — built vs. dead links | PAGES |
+| Loading / empty / error state machine | PAGES |
+| Six phases to v1.0 | ROADMAP |
+| Screens built vs. linked | ROADMAP |
+| Tenant provisioning flow | DEPLOYMENT |
+
 ## Status at a glance
 
 Prism is at **v0.1 — scaffold**. A single `index.html` renders the Overview

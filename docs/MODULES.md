@@ -5,6 +5,31 @@ routes and widgets without core code knowing it exists. Modules are how Prism
 is sold: the core dashboard is the base subscription, modules are per-month
 upsells.
 
+## How a module plugs in
+
+```mermaid
+flowchart TD
+    cfg["prism.config.js<br/>modules: ['inventory']"] --> reg["module registry"]
+    reg --> dyn["dynamic import<br/>src/modules/inventory/"]
+    dyn --> mod["module contract object"]
+
+    mod --> nav["nav[]<br/>sidebar entries"]
+    mod --> routes["routes{}<br/>#/modules/inventory"]
+    mod --> widgets["widgets[]<br/>injected into core views"]
+    mod --> fetch["fetch()<br/>store.modules.inventory"]
+
+    nav --> shell["app shell"]
+    routes --> router["router"]
+    widgets --> slots["named slots"]
+    fetch --> store[("store")]
+
+    notEnabled["module NOT in config"] --> slot["renders as upsell slot<br/>name · desc · icon · price"]
+    slot -.-> noRequest["no import · no request · no nav entry"]
+```
+
+Core never imports a module. Removing a module directory must not break a page
+load.
+
 ## Contract
 
 Every module is a directory under `src/modules/<id>/` exporting a default
@@ -59,6 +84,23 @@ export default {
 
 ## Widget slots
 
+```mermaid
+flowchart TB
+    subgraph overview["Overview view"]
+        s1(["overview:after-ai-bar"])
+        s2(["overview:after-stats"])
+        s3(["overview:after-charts"])
+        s4(["overview:sidebar-rail — reserved"])
+    end
+    subgraph other["Elsewhere"]
+        s5(["analytics:tabs"])
+        s6(["topbar:actions"])
+    end
+    inv["Inventory<br/>low-stock strip"] --> s2
+    prod["Production Story<br/>stage pipeline"] --> s3
+    ecom["eCommerce Connect<br/>channel split"] --> s5
+```
+
 Named insertion points core views expose. A module declares which it targets.
 
 | Slot | Location |
@@ -74,6 +116,19 @@ Slots are additive and never reordered by a module; render order follows the
 order of `config.modules`.
 
 ## Catalogue
+
+Build order is forced by dependencies, not by price:
+
+```mermaid
+flowchart LR
+    core["core<br/>v0.5"] --> crm["CRM + Pipeline<br/>Deal entity already exists<br/>cheapest · build first"]
+    core --> admin["Admin Panel<br/>included · needs role check"]
+    crm --> prod["Production Story<br/>£49/mo<br/>needs stage-history entity"]
+    crm --> inv["Inventory<br/>£39/mo<br/>needs write-capable adapter"]
+    backend{{"backend decision<br/>UNRESOLVED"}} --> ecom["eCommerce Connect<br/>£39/mo<br/>OAuth + token store"]
+    inv --> ecom
+```
+
 
 ### Production Story — £49/mo
 

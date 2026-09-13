@@ -4,6 +4,24 @@ Every screen Prism advertises, its current state, and what it must contain.
 The sidebar in the v0.1 scaffold links to seven destinations. **One of them
 exists.** The rest are `href="#"`.
 
+```mermaid
+flowchart TD
+    root["#/"] --> ov["#/overview<br/>BUILT · placeholder data"]
+    root -.-> an["#/analytics"]
+    root -.-> rp["#/reports<br/>badge says 2 · nothing generates them"]
+    root -.-> ds["#/data-sources"]
+    root -.-> ad["#/admin"]
+    root -.-> st["#/settings"]
+    root -.-> pm["#/modules/production-story"]
+    root -.-> cm["#/modules/crm-pipeline"]
+    root -.-> so["sign out<br/>no auth exists"]
+
+    classDef built stroke-width:3px
+    class ov built
+```
+
+Solid line = exists. Dotted = `href="#"`.
+
 | Screen | Route | State |
 | --- | --- | --- |
 | Overview | `#/overview` | Built, placeholder data |
@@ -97,8 +115,27 @@ authenticating host before any real data is loaded.
 
 ## Empty, loading and error states
 
-None of these exist anywhere, and they are the states a new tenant sees first.
-Every data-bearing component needs all four:
+Every data-bearing component moves through these. None of them exist:
+
+```mermaid
+stateDiagram-v2
+    [*] --> Loading : view mounts
+    Loading --> Empty : no data connected
+    Loading --> Error : fetch failed
+    Loading --> Partial : some sources failed
+    Loading --> Ready : data arrived
+    Error --> Loading : retry
+    Empty --> Loading : source connected
+    Partial --> Loading : retry failed source
+    Ready --> Loading : period changed
+    Ready --> [*] : view unmounts
+
+    note right of Empty
+        v0.1 skips this entirely:
+        a new tenant sees five zeros
+        and five fake companies
+    end note
+```
 
 | State | Requirement |
 | --- | --- |
