@@ -1,0 +1,565 @@
+/* =====================================================================
+   BUTTONS
+   ===================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition);
+  text-decoration: none;
+}
+.btn-primary {
+  background: var(--gold);
+  color: #0f0f1e;
+  font-weight: 600;
+}
+.btn-primary:hover { background: #d9b85c; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border-muted);
+}
+.btn-ghost:hover { border-color: var(--border); color: var(--text); }
+
+/* =====================================================================
+   CARDS — extracted from Mandate's card.tsx + Adam Capital dashboard
+   ===================================================================== */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--border-muted);
+}
+
+.card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.card-body { padding: 20px; }
+.card-body-flush { padding: 0; }
+
+/* =====================================================================
+   KPI STAT BAR — mirrors Mandate's stat bar (Card with flex divide)
+   ===================================================================== */
+.stat-bar {
+  display: flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.stat {
+  flex: 1;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-right: 1px solid var(--border-muted);
+  cursor: pointer;
+  transition: background var(--transition);
+  position: relative;
+}
+.stat:last-child { border-right: none; }
+.stat:hover { background: var(--gold-dim); }
+.stat.active { background: var(--gold-dim); }
+.stat.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--gold);
+}
+
+.stat-label {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+.stat.active .stat-label { color: var(--gold); }
+
+.stat-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.stat-value.red { color: var(--red); }
+.stat-value.green { color: var(--green); }
+.stat.active .stat-value { color: var(--gold); }
+
+.stat-change {
+  font-size: 11px;
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.stat-change.up { color: var(--green); }
+.stat-change.down { color: var(--red); }
+
+.stat-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--gold-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.stat-icon svg { width: 18px; height: 18px; color: var(--gold); }
+
+/* =====================================================================
+   GRID LAYOUTS
+   ===================================================================== */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.grid-3-1 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px; }
+.grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+
+/* =====================================================================
+   CHARTS
+   ===================================================================== */
+.chart-container {
+  position: relative;
+  height: 220px;
+}
+
+/* =====================================================================
+   DATA TABLE — extracted from Mandate's table patterns
+   ===================================================================== */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.data-table th {
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--text-dim);
+  border-bottom: 1px solid var(--border-muted);
+  background: var(--surface-2);
+}
+
+.data-table td {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border-muted);
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.data-table tr:last-child td { border-bottom: none; }
+
+.data-table tr:hover td { background: var(--gold-dim); }
+
+.data-table .mono {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 12px;
+}
+
+/* =====================================================================
+   STATUS BADGES — extracted from Mandate status-badge
+   ===================================================================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+.badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+
+.badge-green  { background: rgba(46,196,160,0.12); color: var(--green); }
+.badge-green::before { background: var(--green); }
+
+.badge-amber  { background: rgba(240,160,64,0.12); color: var(--amber); }
+.badge-amber::before { background: var(--amber); }
+
+.badge-red    { background: rgba(224,92,106,0.12); color: var(--red); }
+.badge-red::before { background: var(--red); }
+
+.badge-blue   { background: rgba(77,168,232,0.12); color: var(--blue); }
+.badge-blue::before { background: var(--blue); }
+
+.badge-muted  { background: var(--border-muted); color: var(--text-muted); }
+.badge-muted::before { background: var(--text-dim); }
+
+/* =====================================================================
+   AI INSIGHTS BAR — Prism-specific (no Mandate equivalent)
+   ===================================================================== */
+.ai-bar {
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(201,168,76,0.05) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.ai-bar-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--gold-dim);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 18px;
+}
+
+.ai-bar-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+
+.ai-bar-text {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.55;
+}
+
+.ai-bar-text strong { color: var(--gold); }
+
+/* =====================================================================
+   MODULE PLACEHOLDER — for industry add-on modules
+   ===================================================================== */
+.module-slot {
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 8px;
+  min-height: 140px;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.module-slot:hover {
+  border-color: var(--gold);
+  background: var(--gold-dim);
+}
+.module-slot-icon { font-size: 28px; opacity: 0.5; }
+.module-slot-name { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+.module-slot-desc { font-size: 11px; color: var(--text-dim); }
+.module-slot-price {
+  font-size: 11px;
+  color: var(--gold);
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+/* =====================================================================
+   FILTER PILLS — from Mandate's filter pill pattern
+   ===================================================================== */
+.pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--border-muted);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.pill:hover { border-color: var(--gold); color: var(--text); }
+.pill.active { background: var(--gold); color: #0f0f1e; border-color: var(--gold); font-weight: 600; }
+
+/* =====================================================================
+   SPARKLINE (mini inline chart via canvas)
+   ===================================================================== */
+.spark { display: inline-block; vertical-align: middle; }
+
+/* =====================================================================
+   UTILITY
+   ===================================================================== */
+.text-muted { color: var(--text-muted); }
+.text-gold  { color: var(--gold); }
+.text-green { color: var(--green); }
+.text-red   { color: var(--red); }
+.text-sm    { font-size: 12px; }
+.text-xs    { font-size: 11px; }
+.font-bold  { font-weight: 700; }
+.font-semi  { font-weight: 600; }
+.flex       { display: flex; }
+.flex-col   { flex-direction: column; }
+.items-center { align-items: center; }
+.gap-2      { gap: 8px; }
+.gap-3      { gap: 12px; }
+.ml-auto    { margin-left: auto; }
+.mt-1       { margin-top: 4px; }
+.truncate   { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* =====================================================================
+   PRISM LOGO MARK (inline SVG)
+   ===================================================================== */
+.prism-mark {
+  width: 28px;
+  height: 28px;
+}
+
+/* =====================================================================
+   TABS — Analytics and any view with sections
+   ===================================================================== */
+.tabs {
+  display: flex;
+  gap: 2px;
+  border-bottom: 1px solid var(--border-muted);
+  margin-bottom: 16px;
+}
+
+.tab {
+  appearance: none;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.tab:hover { color: var(--text); }
+
+.tab[aria-selected="true"] {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
+/* =====================================================================
+   STATE BLOCKS — loading / empty / error / partial
+   ===================================================================== */
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.state-title {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.state-icon { font-size: 20px; opacity: 0.7; }
+
+.state-error .state-title { color: var(--red); }
+.state-partial .state-title { color: var(--amber); }
+
+.skeleton {
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0.04) 25%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.04) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+
+.skeleton-line { height: 10px; margin-bottom: 8px; }
+.skeleton-block { height: 100%; min-height: 60px; }
+
+@keyframes skeleton-shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+/* =====================================================================
+   FORMS — Settings, Admin, Data Sources
+   ===================================================================== */
+.field { margin-bottom: 14px; }
+
+.field-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 5px;
+}
+
+.field-hint {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+.input, .select {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  padding: 7px 10px;
+  transition: var(--transition);
+}
+
+.input:hover, .select:hover { border-color: var(--border); }
+.input:disabled, .select:disabled { color: var(--text-dim); cursor: not-allowed; }
+
+.switch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border-muted);
+}
+
+.switch:last-child { border-bottom: none; }
+.switch-label { flex: 1; font-size: 13px; }
+.switch-desc { font-size: 11px; color: var(--text-muted); }
+
+/* =====================================================================
+   KANBAN — CRM pipeline board
+   ===================================================================== */
+.board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.board-col {
+  background: var(--surface);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius);
+  padding: 10px;
+  min-height: 120px;
+}
+
+.board-col-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.deal-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-sm);
+  padding: 9px 10px;
+  margin-bottom: 8px;
+}
+
+.deal-card-name { font-size: 13px; font-weight: 600; }
+.deal-card-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+
+/* =====================================================================
+   STAGE PIPELINE — Production Story
+   ===================================================================== */
+.pipeline {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  overflow-x: auto;
+}
+
+.pipeline-stage {
+  flex: 1 1 0;
+  min-width: 110px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-muted);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  text-align: center;
+}
+
+.pipeline-stage.bottleneck { border-color: var(--amber); }
+.pipeline-count { font-size: 20px; font-weight: 600; }
+.pipeline-name {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.pipeline-dwell { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
+/* =====================================================================
+   SOURCE ROWS — Data Sources
+   ===================================================================== */
+.source-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-muted);
+}
+
+.source-row:last-child { border-bottom: none; }
+.source-name { font-size: 13px; font-weight: 600; }
+.source-meta { font-size: 11px; color: var(--text-muted); }
