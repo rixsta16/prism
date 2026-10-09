@@ -1,55 +1,93 @@
-// Placeholder data. This is the scaffold's hardcoded set — moved out of the
-// markup, not invented again. Swap `dataSource.adapter` to use a real source.
+// Placeholder data for demos and development.
+//
+// Generated from a fixed seed rather than hand-listed, so the set is large
+// enough to exercise the real views — a month of paid invoices behind the
+// MTD figure, enough rows for a table to scroll — while staying identical on
+// every load. Swap `dataSource.adapter` to read from a real source.
 
 const DAY = 86400000;
 const iso = (offsetDays) => new Date(Date.now() - offsetDays * DAY).toISOString().slice(0, 10);
 
+// mulberry32 — small deterministic PRNG. Same seed, same dashboard, always.
+function rng(seed) {
+  return function next() {
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
 const CLIENTS = [
-  { id: 'c1', name: 'Acme Ltd',          email: 'ops@acme.example',    status: 'active',  createdAt: iso(420), tags: ['manufacturing'] },
-  { id: 'c2', name: 'Beta Corp',         email: 'ap@beta.example',     status: 'active',  createdAt: iso(360), tags: ['retail'] },
-  { id: 'c3', name: 'Gamma Works',       email: 'hello@gamma.example', status: 'active',  createdAt: iso(300), tags: ['fabrication'] },
-  { id: 'c4', name: 'Delta Services',    email: 'team@delta.example',  status: 'active',  createdAt: iso(240), tags: ['services'] },
-  { id: 'c5', name: 'Echo Industries',   email: 'buy@echo.example',    status: 'active',  createdAt: iso(180), tags: ['manufacturing'] },
-  { id: 'c6', name: 'Foxtrot Fittings',  email: 'acc@foxtrot.example', status: 'dormant', createdAt: iso(700), tags: ['fabrication'] },
-];
+  { id: 'c1',  name: 'Acme Ltd',           email: 'ops@acme.example',      status: 'active',  tags: ['manufacturing'] },
+  { id: 'c2',  name: 'Beta Corp',          email: 'ap@beta.example',       status: 'active',  tags: ['retail'] },
+  { id: 'c3',  name: 'Gamma Works',        email: 'hello@gamma.example',   status: 'active',  tags: ['fabrication'] },
+  { id: 'c4',  name: 'Delta Services',     email: 'team@delta.example',    status: 'active',  tags: ['services'] },
+  { id: 'c5',  name: 'Echo Industries',    email: 'buy@echo.example',      status: 'active',  tags: ['manufacturing'] },
+  { id: 'c6',  name: 'Foxtrot Fittings',   email: 'acc@foxtrot.example',   status: 'dormant', tags: ['fabrication'] },
+  { id: 'c7',  name: 'Golf Components',    email: 'po@golf.example',       status: 'active',  tags: ['manufacturing'] },
+  { id: 'c8',  name: 'Hotel Interiors',    email: 'pay@hotel.example',     status: 'active',  tags: ['services'] },
+  { id: 'c9',  name: 'India Metalwork',    email: 'admin@india.example',   status: 'active',  tags: ['fabrication'] },
+  { id: 'c10', name: 'Juliet Packaging',   email: 'office@juliet.example', status: 'dormant', tags: ['retail'] },
+].map((c, i) => ({ ...c, createdAt: iso(400 - i * 28) }));
 
-// value is in minor units (pence).
-const RECORDS = [
-  { id: '0001', clientId: 'c1', type: 'order',   value: 120000, date: iso(3),  dueDate: null,     status: 'complete' },
-  { id: '0002', clientId: 'c2', type: 'invoice', value: 350000, date: iso(4),  dueDate: iso(-26), status: 'awaiting' },
-  { id: '0003', clientId: 'c3', type: 'order',   value:  80000, date: iso(5),  dueDate: iso(2),   status: 'in_progress' },
-  { id: '0004', clientId: 'c4', type: 'quote',   value: 500000, date: iso(6),  dueDate: null,     status: 'in_progress' },
-  { id: '0005', clientId: 'c5', type: 'order',   value: 210000, date: iso(7),  dueDate: null,     status: 'complete' },
-  { id: '0006', clientId: 'c1', type: 'invoice', value: 610000, date: iso(9),  dueDate: iso(-21), status: 'complete' },
-  { id: '0007', clientId: 'c2', type: 'order',   value:  45000, date: iso(11), dueDate: null,     status: 'draft' },
-  { id: '0008', clientId: 'c3', type: 'invoice', value: 155000, date: iso(14), dueDate: iso(4),   status: 'awaiting' },
-  { id: '0009', clientId: 'c5', type: 'invoice', value: 520000, date: iso(18), dueDate: iso(-12), status: 'complete' },
-  { id: '0010', clientId: 'c4', type: 'order',   value:  96000, date: iso(21), dueDate: iso(6),   status: 'in_progress' },
-  { id: '0011', clientId: 'c1', type: 'invoice', value: 480000, date: iso(26), dueDate: iso(-4),  status: 'complete' },
-  { id: '0012', clientId: 'c6', type: 'invoice', value:  72000, date: iso(31), dueDate: iso(10),  status: 'awaiting' },
-  { id: '0013', clientId: 'c2', type: 'invoice', value: 550000, date: iso(35), dueDate: iso(5),   status: 'complete' },
-  { id: '0014', clientId: 'c3', type: 'order',   value: 132000, date: iso(38), dueDate: null,     status: 'complete' },
-  { id: '0015', clientId: 'c5', type: 'invoice', value: 420000, date: iso(44), dueDate: iso(14),  status: 'complete' },
-  { id: '0016', clientId: 'c4', type: 'order',   value:  67000, date: iso(49), dueDate: null,     status: 'complete' },
-  { id: '0017', clientId: 'c1', type: 'invoice', value: 510000, date: iso(53), dueDate: iso(23),  status: 'complete' },
-  { id: '0018', clientId: 'c2', type: 'order',   value:  88000, date: iso(58), dueDate: null,     status: 'complete' },
-  { id: '0019', clientId: 'c3', type: 'invoice', value: 460000, date: iso(62), dueDate: iso(32),  status: 'complete' },
-  { id: '0020', clientId: 'c5', type: 'order',   value: 143000, date: iso(67), dueDate: null,     status: 'complete' },
-  { id: '0021', clientId: 'c1', type: 'invoice', value: 410000, date: iso(72), dueDate: iso(42),  status: 'complete' },
-  { id: '0022', clientId: 'c4', type: 'invoice', value: 380000, date: iso(79), dueDate: iso(49),  status: 'complete' },
-  { id: '0023', clientId: 'c2', type: 'order',   value:  59000, date: iso(84), dueDate: null,     status: 'complete' },
-];
+const TYPES = ['invoice', 'invoice', 'invoice', 'order', 'order', 'quote'];
+const OPEN_STATUSES = ['in_progress', 'awaiting', 'draft'];
 
-const DEALS = [
-  { id: 'd1', clientId: 'c1',  stage: 'negotiation', value: 850000,  probability: 70, expectedClose: iso(-20) },
-  { id: 'd2', clientId: 'c3',  stage: 'proposal',    value: 420000,  probability: 45, expectedClose: iso(-35) },
-  { id: 'd3', clientId: null,  stage: 'lead',        value: 150000,  probability: 10, expectedClose: null },
-  { id: 'd4', clientId: 'c4',  stage: 'qualified',   value: 300000,  probability: 30, expectedClose: iso(-50) },
-  { id: 'd5', clientId: 'c5',  stage: 'negotiation', value: 1200000, probability: 60, expectedClose: iso(-14) },
-  { id: 'd6', clientId: 'c2',  stage: 'won',         value: 550000,  probability: 100, expectedClose: iso(20) },
-  { id: 'd7', clientId: 'c6',  stage: 'lost',        value: 200000,  probability: 0,  expectedClose: iso(30) },
-  { id: 'd8', clientId: null,  stage: 'lead',        value: 90000,   probability: 10, expectedClose: null },
-];
+// Values are in minor units (pence) throughout.
+function buildRecords() {
+  const rand = rng(20260914);
+  const rows = [];
+
+  for (let i = 0; i < 140; i++) {
+    const age = Math.floor(rand() * 90);
+    const type = TYPES[Math.floor(rand() * TYPES.length)];
+    const client = CLIENTS[Math.floor(rand() * CLIENTS.length)];
+
+    // Older work has mostly settled; recent work is still moving. That keeps
+    // the status mix plausible instead of uniformly random.
+    const settled = rand() < (age > 30 ? 0.85 : 0.35);
+    const status = settled ? 'complete' : OPEN_STATUSES[Math.floor(rand() * OPEN_STATUSES.length)];
+
+    // dueDate in the past on an unsettled invoice is what makes it read as
+    // overdue — derived at render time, never stored. See docs/DATA-MODEL.md.
+    const dueDate = type === 'quote' ? null : iso(age - 30);
+
+    rows.push({
+      id: String(1000 + i),
+      clientId: client.id,
+      type,
+      value: (Math.floor(rand() * 95) + 5) * 10000,   // £50 – £1,000
+      date: iso(age),
+      dueDate,
+      status,
+    });
+  }
+
+  return rows.sort((a, b) => (a.date < b.date ? 1 : -1));
+}
+
+const STAGES = ['lead', 'qualified', 'proposal', 'negotiation', 'won', 'lost'];
+const PROBABILITY = { lead: 10, qualified: 30, proposal: 45, negotiation: 70, won: 100, lost: 0 };
+
+function buildDeals() {
+  const rand = rng(77001);
+  return Array.from({ length: 14 }, (_, i) => {
+    const stage = STAGES[Math.floor(rand() * STAGES.length)];
+    const client = rand() < 0.2 ? null : CLIENTS[Math.floor(rand() * CLIENTS.length)];
+    return {
+      id: `d${i + 1}`,
+      clientId: client?.id ?? null,
+      stage,
+      value: (Math.floor(rand() * 180) + 20) * 10000,   // £200 – £2,000
+      probability: PROBABILITY[stage],
+      expectedClose: stage === 'lead' ? null : iso(-Math.floor(rand() * 60) - 5),
+    };
+  });
+}
+
+const RECORDS = buildRecords();
+const DEALS = buildDeals();
 
 export default {
   id: 'mock',

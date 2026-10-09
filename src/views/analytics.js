@@ -104,7 +104,7 @@ function ordersTab(s, root) {
           { label: 'Date', cellClass: 'text-muted', render: (r) => fmt.date(r.date) },
           { label: 'Due', cellClass: 'text-muted', render: (r) => fmt.date(r.dueDate) },
           { label: 'Status', render: (r) => badge(r.status, fmt.titleCase(r.status)) },
-        ], orders)
+        ], orders, { scrollAfter: 8 })
       : stateBlock('empty', 'No orders in this period', 'Widen the period filter.'),
       {
         flush: orders.length > 0,
@@ -164,7 +164,7 @@ function clientsTab(s, root) {
       { label: 'Paid', align: 'right', render: (r) => el('span', { class: 'mono', text: fmt.money(r.paid) }) },
       { label: 'Last activity', cellClass: 'text-muted', render: (r) => fmt.date(r.last) },
       { label: 'Status', render: (r) => badge(r.status, fmt.titleCase(r.status)) },
-    ], rows), {
+    ], rows, { scrollAfter: 8 }), {
       flush: true,
       action: exportButton('clients', ['Client', 'Email', 'Records', 'Paid', 'Last activity', 'Status'],
         rows.map((r) => [r.name, r.email ?? '', r.records, (r.paid / 100).toFixed(2), r.last ?? '', r.status])),
@@ -200,7 +200,7 @@ function pipelineTab(s, root) {
       { label: 'Probability', align: 'right', render: (r) => `${r.probability}%` },
       { label: 'Weighted', align: 'right', render: (r) => el('span', { class: 'mono', text: fmt.money(r.weighted) }) },
       { label: 'Expected close', cellClass: 'text-muted', render: (r) => fmt.date(r.expectedClose) },
-    ], rows), {
+    ], rows, { scrollAfter: 8 }), {
       flush: true,
       action: exportButton('deals', ['Client', 'Stage', 'Value', 'Probability', 'Weighted', 'Expected close'],
         rows.map((r) => [r.client, r.stage, (r.value / 100).toFixed(2), r.probability, (r.weighted / 100).toFixed(2), r.expectedClose ?? ''])),
