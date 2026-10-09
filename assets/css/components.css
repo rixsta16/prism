@@ -563,3 +563,125 @@
 .source-row:last-child { border-bottom: none; }
 .source-name { font-size: 13px; font-weight: 600; }
 .source-meta { font-size: 11px; color: var(--text-muted); }
+
+/* =====================================================================
+   MOTION — decorative layer. Every rule here degrades to a static,
+   legible state under prefers-reduced-motion; see src/motion/.
+   ===================================================================== */
+
+/* --- Boot loader: traces the Prism mark, then fills ------------------ */
+.boot-loader {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  background: var(--bg);
+  opacity: 1;
+  transition: opacity 0.35s ease;
+}
+
+.boot-loader-out { opacity: 0; pointer-events: none; }
+
+.boot-mark {
+  width: 64px;
+  height: 64px;
+  color: var(--gold);
+}
+
+.boot-mark svg { width: 100%; height: 100%; }
+
+.boot-label {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+/* The outline draws itself, then the face fades up behind it. */
+.trace-line {
+  stroke-dasharray: 90;
+  stroke-dashoffset: 90;
+  animation: trace-draw 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.trace-line-2 { animation-delay: 0.35s; }
+.trace-line-3 { animation-delay: 0.5s; }
+
+.trace-fill {
+  fill: var(--gold);
+  opacity: 0;
+  animation: trace-resolve 0.5s ease 0.75s forwards;
+}
+
+@keyframes trace-draw  { to { stroke-dashoffset: 0; } }
+@keyframes trace-resolve { to { opacity: 0.14; } }
+
+.boot-loader-static .trace-line {
+  stroke-dashoffset: 0;
+  animation: none;
+}
+.boot-loader-static .trace-fill { opacity: 0.14; animation: none; }
+
+/* --- Iridescent foil ------------------------------------------------- *
+ * A prism splits light, so the brand mark does too. The sheen is a
+ * layered gradient that follows the pointer; with no pointer it rests at
+ * the element's centre and simply reads as a soft highlight.            */
+.foil {
+  position: relative;
+  isolation: isolate;
+}
+
+.foil::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0.55;
+  mix-blend-mode: screen;
+  transition: opacity var(--transition);
+  background:
+    radial-gradient(
+      120px circle at var(--foil-x, 50%) var(--foil-y, 50%),
+      rgba(201,168,76,0.30),
+      rgba(77,168,232,0.18) 38%,
+      rgba(46,196,160,0.14) 58%,
+      transparent 72%
+    );
+}
+
+.foil:hover::after { opacity: 0.9; }
+
+@media (prefers-reduced-motion: reduce) {
+  .foil::after { transition: none; }
+}
+
+/* --- Scroll fade ----------------------------------------------------- */
+.scroll-fade {
+  position: relative;
+  overflow-y: auto;
+  /* The mask is driven by two custom properties the JS toggles via class,
+     so only the edge with content behind it actually fades. */
+  --fade-top: 0px;
+  --fade-bottom: 0px;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--fade-top),
+    #000 calc(100% - var(--fade-bottom)),
+    transparent 100%
+  );
+}
+
+.scroll-fade.faded-top    { --fade-top: 28px; }
+.scroll-fade.faded-bottom { --fade-bottom: 28px; }
+
+/* --- Stat value scramble --------------------------------------------- */
+.stat-value {
+  font-variant-numeric: tabular-nums;   /* stops the width jittering mid-scramble */
+}

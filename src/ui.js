@@ -1,3 +1,5 @@
+import { scrollFade } from './motion/index.js';
+
 // Small DOM helpers. All text from the data layer goes in via textContent —
 // client names and record references are untrusted input.
 
@@ -57,7 +59,10 @@ export function badge(status, label) {
   return el('span', { class: `badge badge-${map[status] ?? 'muted'}`, text: label });
 }
 
-export function table(columns, rows) {
+// `scrollAfter` caps a long table's height and fades the edge that still has
+// rows behind it, so a card does not grow to 60 rows tall. The caller gets
+// back a node carrying .cleanup() when the fade is active.
+export function table(columns, rows, { scrollAfter = 0 } = {}) {
   const head = el('tr', {}, columns.map((c) =>
     el('th', { text: c.label, style: c.align === 'right' ? 'text-align:right' : null })
   ));
@@ -72,12 +77,21 @@ export function table(columns, rows) {
       return cell;
     }))
   );
-  return el('div', { class: 'table-scroll' }, [
+  const node = el('div', { class: 'table-scroll' }, [
     el('table', { class: 'data-table' }, [
       el('thead', {}, [head]),
       el('tbody', {}, body),
     ]),
   ]);
+
+  if (scrollAfter && rows.length > scrollAfter) {
+    node.style.maxHeight = `${scrollAfter * 41 + 38}px`;
+    requestAnimationFrame(() => {
+      if (node.isConnected) node.cleanup = scrollFade(node);
+    });
+  }
+
+  return node;
 }
 
 export function tabs(items, activeKey, onSelect) {

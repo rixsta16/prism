@@ -6,6 +6,8 @@ import { PERIODS } from './periods.js';
 import { prefs } from './prefs.js';
 import { loadEnabled, navEntries, routes as moduleRoutes } from './modules/registry.js';
 import { el } from './ui.js';
+import { startBootLoader } from './motion/boot-loader.js';
+import { foil, morphLabel } from './motion/index.js';
 
 let config = null;
 let adapter = null;
@@ -104,8 +106,26 @@ function wireShell() {
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
   window.addEventListener('hashchange', close);
 
-  document.getElementById('refresh').addEventListener('click', () => reload());
-  window.addEventListener('prism:reload', () => reload());
+  const refresh = document.getElementById('refresh');
+  const refreshLabel = refresh.querySelector('[data-label]');
+
+  async function syncNow() {
+    if (refresh.disabled) return;
+    refresh.disabled = true;
+    morphLabel(refresh, refreshLabel, 'Syncing…');
+    await reload();
+    morphLabel(refresh, refreshLabel, store.getState().status === 'error' ? 'Retry' : 'Synced');
+    setTimeout(() => {
+      morphLabel(refresh, refreshLabel, 'Refresh');
+      refresh.disabled = false;
+    }, 1400);
+  }
+
+  refresh.addEventListener('click', syncNow);
+  window.addEventListener('prism:reload', () => syncNow());
+
+  // The brand mark catches the light — a prism splitting it.
+  foil(document.querySelector('.sidebar-logo'));
 
   window.addEventListener('prism:enable-module', (e) => {
     window.alert(
@@ -126,9 +146,12 @@ function fatal(message) {
 }
 
 async function boot() {
+  const loader = startBootLoader();
+
   try {
     config = await loadConfig();
   } catch (e) {
+    loader.fail();
     fatal(e.message);
     return;
   }
@@ -167,7 +190,10 @@ async function boot() {
     onNavigate: markActive,
   });
 
-  if (adapter) reload();
+  // Hold the loader until the first fetch settles, so the dashboard appears
+  // with its numbers already in place rather than filling in behind it.
+  if (adapter) await reload();
+  loader.done();
 }
 
 boot();

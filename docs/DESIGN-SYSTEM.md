@@ -172,6 +172,36 @@ Module slots use geometric glyphs (◫ ◍ ▤ ⇄) rather than emoji, which ren
 inconsistently across platforms and do not inherit colour. Nav icons are the
 stroked SVG set, defined once in `src/app.js`.
 
+## Motion
+
+Five decorative primitives live in `src/motion/`, adapted from the patterns in
+[dqnamo.com/kitchen](https://www.dqnamo.com/kitchen). The rule for the whole
+folder: **the product must read correctly with every one of them switched
+off.** Each checks `prefers-reduced-motion` and jumps to its final state when
+set, and each returns a teardown a view calls on unmount.
+
+| Primitive | Where it runs | What it does |
+| --- | --- | --- |
+| Logo trace loader | Boot, until the first fetch settles | Draws the Prism mark stroke by stroke, then fills it. Holds a 650ms floor so a fast load still reads as deliberate rather than a flash, and gets out of the way immediately on a failed boot so the error is visible. |
+| Iridescent foil | Sidebar mark, primary button | A layered gradient that follows the pointer — a prism splitting light. Rests at the element's centre with no pointer; disabled on coarse pointers. |
+| Scramble text | KPI values | On a figure that actually changed, the number cycles through random glyphs before settling. Digits scramble as digits so the string keeps its width; `font-variant-numeric: tabular-nums` stops the rest of the jitter. |
+| Morphing label | The Refresh button | Refresh → Syncing… → Synced → Refresh, with the button's width animating between each. |
+| Scroll fade | Tables past eight rows | Caps the height and masks the edge — but only the edge that still has rows behind it. A fade with nothing behind it reads as a rendering bug. |
+
+Deliberately not taken from that collection: the cassette player, playing
+cards, stamp, ticket and receipt printer. They are well made, and they belong
+to a warmer, more playful product than a dense operator dashboard. Hold-to-
+confirm is worth having the moment Prism gains a destructive action; it has
+none yet, and a confirmation flow guarding nothing is theatre.
+
+### Rules for anything added here
+
+- Decorative only. No motion may be the sole carrier of information.
+- Every primitive honours `prefers-reduced-motion`.
+- Nothing animates on first paint except the boot loader.
+- Scrambled or animated text keeps an `aria-label` of its final value, so
+  assistive tech reads the number once instead of every frame of noise.
+
 ## Accessibility
 
 Done:

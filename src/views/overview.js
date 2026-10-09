@@ -4,12 +4,18 @@ import * as metrics from '../metrics.js';
 import { createChartRegistry, STATUS_COLOUR } from '../charts.js';
 import { el, card, state as stateBlock, table, badge, chartBox, pageTitle, skeletonLines } from '../ui.js';
 import { PERIODS } from '../periods.js';
+import { scrambleTo } from '../motion/index.js';
 import { getConfig } from '../app.js';
 import { renderSlot } from '../modules/registry.js';
 
 let unsub = null;
 let charts = null;
 let selectedMetric = 'revenue';
+
+// Last rendered figure per KPI. A stat scrambles only when its value actually
+// moved — re-rendering for an unrelated reason should not set the whole bar
+// twitching.
+let lastValues = {};
 
 const STAT_DEFS = [
   { key: 'revenue',     label: 'Revenue (MTD)' },
@@ -38,6 +44,17 @@ function statCard(key, label, k, onSelect) {
     change = 'this period';
   }
 
+  const changed = lastValues[key] !== undefined && lastValues[key] !== value;
+  const valueNode = el('div', {
+    class: `stat-value${key === 'outstanding' ? ' red' : ''}`,
+    text: changed ? lastValues[key] : value,
+  });
+  if (changed) {
+    // Run on the next frame, once the node is in the document.
+    requestAnimationFrame(() => scrambleTo(valueNode, value));
+  }
+  lastValues[key] = value;
+
   return el('button', {
     type: 'button',
     class: `stat${key === selectedMetric ? ' active' : ''}`,
@@ -46,10 +63,7 @@ function statCard(key, label, k, onSelect) {
   }, [
     el('div', {}, [
       el('div', { class: 'stat-label', text: label }),
-      el('div', {
-        class: `stat-value${key === 'outstanding' ? ' red' : ''}`,
-        text: value,
-      }),
+      valueNode,
       el('div', {
         class: `stat-change ${changeClass}`,
         style: changeClass ? null : 'color:var(--text-dim)',
@@ -229,5 +243,6 @@ export default {
     unsub = null;
     charts?.destroyAll();
     charts = null;
+    lastValues = {};
   },
 };

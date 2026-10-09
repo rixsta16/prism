@@ -42,6 +42,10 @@ prism/
 │   ├── csv.js                 # export, with formula-injection guarding
 │   ├── prefs.js               # per-viewer localStorage, guarded
 │   ├── ui.js                  # DOM helpers; textContent only
+│   ├── motion/                # decorative primitives; all reduced-motion aware
+│   │   ├── index.js           # scramble, morph label, scroll fade, foil
+│   │   ├── boot-loader.js     # traces the Prism mark during boot
+│   │   └── dom.js             # the two helpers the loader needs pre-boot
 │   ├── adapters/mock.js
 │   ├── views/                 # overview, analytics, reports,
 │   │                          # data-sources, admin, settings
